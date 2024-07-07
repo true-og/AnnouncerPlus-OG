@@ -3,6 +3,7 @@ import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
   kotlin("jvm") version "2.0.0"
+  eclipse
   alias(libs.plugins.indra) apply false
   alias(libs.plugins.indraGit)
   alias(libs.plugins.runPaper)
@@ -30,7 +31,6 @@ dependencies {
   implementation(platform(kotlin("bom")))
 
   compileOnly("dev.folia", "folia-api", "1.19.4-R0.1-SNAPSHOT")
-  compileOnly("com.github.MilkBowl", "VaultAPI", "1.7.1")
   compileOnly("net.essentialsx", "EssentialsX", "2.20.1") {
     isTransitive = false
   }

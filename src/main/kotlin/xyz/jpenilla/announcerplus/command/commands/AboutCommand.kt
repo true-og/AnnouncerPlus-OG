@@ -52,11 +52,11 @@ class AboutCommand : BaseCommand() {
     val color = randomColor()
     val nameAndVersion = text {
       hoverEvent(miniMessage("<rainbow>click me!"))
-      clickEvent(openUrl(announcerPlus.description.website!!))
-      append(text(announcerPlus.description.name))
+      clickEvent(openUrl(announcerPlus.pluginMeta?.website!!))
+      append(text(announcerPlus.pluginMeta.name))
       append(space())
       val lightenedColor = color.modifyHSV(sRatio = 0.3f, vRatio = 2.0f)
-      append(miniMessage("<gradient:$color:$lightenedColor>${announcerPlus.description.version}"))
+      append(miniMessage("<gradient:$color:$lightenedColor>${announcerPlus.pluginMeta?.version}"))
     }
     val spaces = " ".repeat((nameAndVersion.measurePlain() * 1.5).roundToInt())
     val header = miniMessage("<gradient:$color:white:$color><strikethrough>$spaces").center()

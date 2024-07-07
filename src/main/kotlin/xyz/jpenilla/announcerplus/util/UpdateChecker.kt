@@ -54,7 +54,7 @@ class UpdateChecker(private val plugin: AnnouncerPlus, private val githubRepo: S
     val versionMap = LinkedHashMap<String, String>()
     result.forEach { versionMap[it.asJsonObject["tag_name"].asString] = it.asJsonObject["html_url"].asString }
     val versionList = LinkedList(versionMap.keys)
-    val currentVersion = "v" + plugin.description.version
+    val currentVersion = "v" + plugin.pluginMeta?.version
     if (versionList[0] == currentVersion) {
       return // Up to date, do nothing
     }

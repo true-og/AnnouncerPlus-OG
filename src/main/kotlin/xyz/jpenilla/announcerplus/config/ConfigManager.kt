@@ -72,6 +72,7 @@ class ConfigManager(
     .build()
 
   private val mainConfigPath = dataDirectory.resolve("main.conf")
+
   private val mainConfigLoader: HoconConfigurationLoader = createLoader(mainConfigPath) {
     it.header(
       """ 
@@ -81,7 +82,7 @@ class ConfigManager(
           |  / ___ |/ / / / / / / /_/ / /_/ / / / / /__/  __/ /  / ____/ / /_/ (__  )   /_/   
           | /_/  |_/_/ /_/_/ /_/\____/\__,_/_/ /_/\___/\___/_/  /_/   /_/\__,_/____/  
           | 
-          |     v${announcerPlus.description.version}
+          |     v${announcerPlus.pluginMeta?.version}
       """.trimMargin()
     )
   }

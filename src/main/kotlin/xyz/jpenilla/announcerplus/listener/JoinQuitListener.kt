@@ -23,6 +23,7 @@
  */
 package xyz.jpenilla.announcerplus.listener
 
+import net.kyori.adventure.text.Component
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -40,7 +41,7 @@ class JoinQuitListener : Listener, KoinComponent {
   @EventHandler(priority = EventPriority.HIGHEST)
   fun onJoin(event: PlayerJoinEvent) {
     if (configManager.mainConfig.joinFeatures) {
-      event.joinMessage = ""
+      event.joinMessage(Component.empty())
       if (configManager.mainConfig.firstJoinConfigEnabled && !event.player.hasPlayedBefore()) {
         configManager.firstJoinConfig.onJoin(event.player)
         return
@@ -60,7 +61,7 @@ class JoinQuitListener : Listener, KoinComponent {
   @EventHandler(priority = EventPriority.HIGHEST)
   fun onQuit(event: PlayerQuitEvent) {
     if (configManager.mainConfig.quitFeatures) {
-      event.quitMessage = ""
+      event.quitMessage(Component.empty())
       for (entry in configManager.mainConfig.randomQuitConfigs.entries) {
         if (entry.key != "demo" && event.player.hasPermission("announcerplus.randomquit.${entry.key}")) {
           val randomConfigName = entry.value.selectRandomWeighted()

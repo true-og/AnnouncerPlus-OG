@@ -28,9 +28,9 @@ import com.google.gson.GsonBuilder
 import io.papermc.lib.PaperLib.getMinecraftVersion
 import io.papermc.lib.PaperLib.isPaper
 import io.papermc.lib.PaperLib.suggestPaper
-import net.milkbowl.vault.permission.Permission
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
+import org.incendo.cloud.permission.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
