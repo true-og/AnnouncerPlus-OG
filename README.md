@@ -1,7 +1,11 @@
-![Announcer Plus](https://i.imgur.com/C46OmJ6.png)
->[![GitHub Actions](https://github.com/jmanpenilla/AnnouncerPlus/workflows/AnnouncerPlus/badge.svg)](https://github.com/jmanpenilla/WanderingTrades/actions) [![Jenkins](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.jpenilla.xyz%2Fjob%2FAnnouncerPlus%2F&label=Jenkins)](https://jenkins.jpenilla.xyz/job/AnnouncerPlus/)
+# AnnouncerPlus-OG
+
+A fork of [AnnouncerPlus](https://github.com/jpenilla/AnnouncerPlus) maintained for [TrueOG Network](https://true-og.net)
+
+# Changes
+
+- Removed vault
+- Fix some kotlin warnings
+- Update some API deprecations
+
 > * [AnnouncerPlus Wiki](https://github.com/jmanpenilla/AnnouncerPlus/wiki)
-> * [Spigot Resource Page](https://www.spigotmc.org/resources/announcer-plus.81005/)
-> * [Discord](https://discord.gg/V2PsMkx)
-> * [Dev Builds](https://jenkins.jpenilla.xyz/job/AnnouncerPlus/)
-> * [bStats](https://bstats.org/plugin/bukkit/Announcer-Plus/8067)

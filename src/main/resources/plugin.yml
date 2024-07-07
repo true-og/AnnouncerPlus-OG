@@ -1,12 +1,9 @@
-name: AnnouncerPlus
+name: AnnouncerPlus-OG
 version: $version
 main: xyz.jpenilla.announcerplus.AnnouncerPlus
 description: $description
-authors:
-  - jmp
+authors: [jmp, NotAlexNoyle]
 website: $website
-depend:
-  - Vault
 api-version: $apiVersion
 softdepend:
   - PlaceholderAPI

@@ -23,7 +23,6 @@
  */
 package xyz.jpenilla.announcerplus.command.commands
 
-import java.util.concurrent.CompletableFuture
 import net.kyori.adventure.text.format.NamedTextColor.DARK_GRAY
 import net.kyori.adventure.text.format.NamedTextColor.GRAY
 import net.kyori.adventure.text.format.NamedTextColor.WHITE
@@ -40,7 +39,6 @@ import org.incendo.cloud.minecraft.extras.MinecraftHelp.captionMessageProvider
 import org.incendo.cloud.minecraft.extras.MinecraftHelp.helpColors
 import org.incendo.cloud.minecraft.extras.caption.ComponentCaptionFormatter
 import org.incendo.cloud.parser.standard.StringParser.greedyStringParser
-import org.incendo.cloud.suggestion.Suggestion
 import org.incendo.cloud.suggestion.SuggestionProvider
 import xyz.jpenilla.announcerplus.command.BaseCommand
 import xyz.jpenilla.announcerplus.command.Commander

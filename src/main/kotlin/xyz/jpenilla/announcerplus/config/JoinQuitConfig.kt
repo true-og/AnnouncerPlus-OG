@@ -196,7 +196,7 @@ class JoinQuitConfig : SelfSavable<CommentedConfigurationNode>, KoinComponent {
         announcerPlus.scheduleAsync {
           Bukkit.getOnlinePlayers().toList().forEach { onlinePlayer ->
             if (onlinePlayer.name != player.name) {
-              if (announcerPlus.perms!!.playerHas(onlinePlayer, permission) || permission.isEmpty()) {
+              if (onlinePlayer.hasPermission("${announcerPlus.name}.messages.$name.afk") || permission.isEmpty()) {
                 chat.send(onlinePlayer, announcerPlus.configManager.parse(player, join.broadcasts))
                 if (join.broadcastSounds.isNotEmpty()) {
                   announcerPlus.audiences().player(onlinePlayer).playSounds(join.broadcastSounds, join.randomBroadcastSound)
@@ -223,7 +223,7 @@ class JoinQuitConfig : SelfSavable<CommentedConfigurationNode>, KoinComponent {
     if (name == null || !player.hasPermission("announcerplus.quit.$name") || isVanished(player)) return
     for (onlinePlayer in Bukkit.getOnlinePlayers()) {
       if (onlinePlayer.name != player.name) {
-        if (announcerPlus.perms!!.playerHas(onlinePlayer, permission) || permission.isEmpty()) {
+        if (onlinePlayer.hasPermission(permission) || permission.isEmpty()) {
           chat.send(onlinePlayer, announcerPlus.configManager.parse(player, quit.broadcasts))
           if (quit.sounds.isNotEmpty()) {
             announcerPlus.audiences().player(onlinePlayer).playSounds(quit.sounds, quit.randomSound)

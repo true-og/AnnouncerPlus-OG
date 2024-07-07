@@ -220,15 +220,15 @@ class MessageConfig : SelfSavable<CommentedConfigurationNode>, KoinComponent {
   }
 
   private fun broadcast(message: Message) {
-    for (onlinePlayer in Bukkit.getOnlinePlayers().toList()) {
-      if (announcerPlus.essentials != null) {
-        if (announcerPlus.essentials!!.isAfk(onlinePlayer) &&
-          announcerPlus.perms!!.playerHas(onlinePlayer, "${announcerPlus.name}.messages.$name.afk")
-        ) {
+    for (onlinePlayer in Bukkit.getOnlinePlayers()) {
+      // Check if Essentials is present and the player is AFK (Essentials hook)
+      if (announcerPlus.essentials != null && announcerPlus.essentials!!.isAfk(onlinePlayer)) {
+        // Check if the player has the permission to receive AFK messages
+        if (onlinePlayer.hasPermission("${announcerPlus.name}.messages.$name.afk")) {
           continue
         }
       }
-      if (announcerPlus.perms!!.playerHas(onlinePlayer, "${announcerPlus.name}.messages.$name")) {
+      if (onlinePlayer.hasPermission("${announcerPlus.name}.messages.$name")) {
         with(message) {
           val audience = announcerPlus.audiences().player(onlinePlayer)
           if (messageText.size != 0) {
