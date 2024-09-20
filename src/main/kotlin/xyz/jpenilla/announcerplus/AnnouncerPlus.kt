@@ -28,8 +28,6 @@ import com.google.gson.GsonBuilder
 import io.papermc.lib.PaperLib.getMinecraftVersion
 import io.papermc.lib.PaperLib.isPaper
 import io.papermc.lib.PaperLib.suggestPaper
-import org.bstats.bukkit.Metrics
-import org.bstats.charts.SimplePie
 import org.incendo.cloud.permission.Permission
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -45,7 +43,6 @@ import xyz.jpenilla.announcerplus.task.ToastTask
 import xyz.jpenilla.announcerplus.util.AsyncTasksThreadFactory
 import xyz.jpenilla.announcerplus.util.Constants
 import xyz.jpenilla.announcerplus.util.DisplayTracker
-import xyz.jpenilla.announcerplus.util.UpdateChecker
 import xyz.jpenilla.announcerplus.util.dataPath
 import xyz.jpenilla.pluginbase.legacy.PluginBase
 import java.util.concurrent.Executors
@@ -64,7 +61,7 @@ class AnnouncerPlus : PluginBase(), KoinComponent {
   private lateinit var commands: Commands
 
   override fun enable() {
-    if (!setupPermissions()) {
+    if (! setupPermissions()) {
       logger.warning("Permissions plugin not found. AnnouncerPlus will not work.")
       isEnabled = false
       return
@@ -98,17 +95,6 @@ class AnnouncerPlus : PluginBase(), KoinComponent {
     server.pluginManager.registerEvents(JoinQuitListener(), this)
     broadcast()
 
-    if (configManager.mainConfig.checkForUpdates) {
-      UpdateChecker(this, "jpenilla/AnnouncerPlus").run()
-    }
-
-    setupMetrics()
-  }
-
-  private fun setupMetrics() {
-    val metrics = Metrics(this, 8067)
-    metrics.addCustomChart(SimplePie("join_quit_configs") { configManager.joinQuitConfigs.size.toString() })
-    metrics.addCustomChart(SimplePie("message_configs") { configManager.messageConfigs.size.toString() })
   }
 
   private fun initToastTask() {

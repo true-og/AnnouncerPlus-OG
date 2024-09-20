@@ -1,12 +1,11 @@
 name: AnnouncerPlus-OG
-version: $version
+version: '${version}'
 main: xyz.jpenilla.announcerplus.AnnouncerPlus
-description: $description
+description: A soft fork of AnnouncerPlus-OG maintained for TrueOG Network
 authors: [jmp, NotAlexNoyle]
-website: $website
-api-version: $apiVersion
+website: https://github.com/true-og/AnnouncerPlus-OG
+api-version: '${apiVersion}'
 softdepend:
-  - PlaceholderAPI
   - Essentials
   - ViaVersion
 folia-supported: true
