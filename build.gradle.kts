@@ -20,27 +20,40 @@ repositories {
     maven("https://repo.essentialsx.net/releases/")
     maven("https://repo.spongepowered.org/repository/maven-public/")
     maven("https://repo.purpurmc.org/snapshots")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/") {
+        content { includeGroup("me.clip") }
+    }
     maven("https://jitpack.io") {
         content { includeGroupByRegex("com\\.github\\..*") }
     }
 }
 
 dependencies {
+    compileOnly("dev.folia:folia-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("org.purpurmc.purpur:purpur-api:1.19.4-R0.1-SNAPSHOT")
-    compileOnly("net.essentialsx", "EssentialsX", "2.20.1") { isTransitive = false }
+    compileOnly("net.essentialsx:EssentialsX:2.20.1") { isTransitive = false }
+    compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.mojang:datafixerupper:7.0.14")
     compileOnly("io.github.miniplaceholders:miniplaceholders-api:2.2.3")
 
-    implementation(platform(kotlin("bom")))
-    implementation(platform("net.kyori:adventure-bom:4.17.0"))
+	implementation("xyz.jpenilla:reflection-remapper:0.1.1")
+    implementation(platform("org.incendo:cloud-bom:2.0.0-rc.2"))
+    implementation("org.incendo:cloud-kotlin-extensions")
+    implementation(platform("org.incendo:cloud-minecraft-bom:2.0.0-beta.9"))
+    implementation("org.incendo:cloud-paper")
+    implementation("org.incendo:cloud-minecraft-extras")
+    implementation(platform("org.incendo:cloud-translations-bom:1.0.0-SNAPSHOT"))
+    implementation("org.incendo:cloud-translations-core")
+    implementation("org.incendo:cloud-translations-bukkit")
+    implementation("org.incendo:cloud-translations-minecraft-extras")
+
     implementation("net.kyori", "adventure-extra-kotlin")
     implementation("net.kyori", "adventure-serializer-configurate4")
-    implementation(platform("org.incendo:cloud-bom:2.0.0-rc.2"))
-    implementation("org.incendo:cloud-paper:2.0.0-beta.10")
+    implementation("org.spongepowered:configurate-extra-kotlin:4.1.2")
     implementation("org.spongepowered:configurate-hocon:4.1.2")
-    implementation("io.insert-koin", "koin-core", "3.5.6")
-    implementation("xyz.jpenilla", "legacy-plugin-base", "0.0.1+122-SNAPSHOT")
-    implementation("io.papermc", "paperlib", "1.0.8")
+    implementation("io.insert-koin:koin-core:3.5.6")
+    implementation("xyz.jpenilla:legacy-plugin-base:0.0.1+122-SNAPSHOT")
+    implementation("io.papermc:paperlib:1.0.8")
     implementation(project(":libs:Utilities-OG"))
     implementation(project(":libs:GxUI-OG"))
     implementation(project(":libs:DiamondBank-OG"))
@@ -72,7 +85,7 @@ tasks {
         val prefix = "${project.group}.${project.name.lowercase()}.lib"
         sequenceOf(
             "com.typesafe.config", "io.leangen.geantyref", "io.papermc.lib",
-            "net.kyori", "org.incendo", "org.koin", "org.spongepowered.configurate", "kotlin"
+            "net.kyori", "org.incendo", "org.koin", "org.spongepowered.configurate", "kotlin", "xyz.jpenilla.reflectionremapper",
         ).forEach { pkg ->
             relocate(pkg, "$prefix.$pkg")
         }
