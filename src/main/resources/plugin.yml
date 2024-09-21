@@ -5,6 +5,8 @@ description: A soft fork of AnnouncerPlus-OG maintained for TrueOG Network
 authors: [jmp, NotAlexNoyle]
 website: https://github.com/true-og/AnnouncerPlus-OG
 api-version: '${apiVersion}'
+depend:
+  - LuckPerms
 softdepend:
   - Essentials
   - ViaVersion

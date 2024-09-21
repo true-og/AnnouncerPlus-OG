@@ -28,7 +28,9 @@ import com.google.gson.GsonBuilder
 import io.papermc.lib.PaperLib.getMinecraftVersion
 import io.papermc.lib.PaperLib.isPaper
 import io.papermc.lib.PaperLib.suggestPaper
-import org.incendo.cloud.permission.Permission
+import net.luckperms.api.LuckPerms
+import org.bukkit.plugin.RegisteredServiceProvider
+import org.bukkit.Bukkit
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
@@ -53,8 +55,7 @@ import java.util.logging.Level
 class AnnouncerPlus : PluginBase(), KoinComponent {
   val gson: Gson = GsonBuilder().create()
   val configManager: ConfigManager by inject()
-
-  var perms: Permission? = null
+  var perms: LuckPerms? = null
   var essentials: EssentialsHook? = null
   var toastTask: ToastTask? = null
   private var asyncExecutor: ScheduledExecutorService? = null
@@ -152,11 +153,17 @@ class AnnouncerPlus : PluginBase(), KoinComponent {
     return requireNotNull(asyncExecutor) { "Async Executor not initialized" }
   }
 
-  private fun setupPermissions(): Boolean {
-    val rsp = server.servicesManager.getRegistration(Permission::class.java)
-    if (rsp != null) {
-      perms = rsp.provider
+    private fun setupPermissions(): Boolean {
+        val provider: RegisteredServiceProvider<LuckPerms>? = Bukkit.getServicesManager().getRegistration(LuckPerms::class.java)
+
+        return if (provider != null) {
+            perms = provider.provider
+            logger.info("LuckPerms found and hooked successfully.")
+            true
+        } else {
+            logger.warning("LuckPerms not found or not registered.")
+            false
+        }
     }
-    return perms != null
-  }
+
 }

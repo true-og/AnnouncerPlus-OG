@@ -1,29 +1,6 @@
-/*
- * This file is part of AnnouncerPlus, licensed under the MIT License.
- *
- * Copyright (c) 2020-2024 Jason Penilla
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 package xyz.jpenilla.announcerplus.listener
 
-import net.kyori.adventure.text.Component
+import me.barny1094875.utilitiesog.UtilitiesOG
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -32,54 +9,69 @@ import org.bukkit.event.player.PlayerQuitEvent
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import xyz.jpenilla.announcerplus.config.ConfigManager
-import xyz.jpenilla.announcerplus.config.MainConfig.JoinQuitPair
-import xyz.jpenilla.pluginbase.legacy.WeightedRandom
 
 class JoinQuitListener : Listener, KoinComponent {
-  private val configManager: ConfigManager by inject()
+    private val configManager: ConfigManager by inject()
 
-  @EventHandler(priority = EventPriority.HIGHEST)
-  fun onJoin(event: PlayerJoinEvent) {
-    if (configManager.mainConfig.joinFeatures) {
-      event.joinMessage(Component.empty())
-      if (configManager.mainConfig.firstJoinConfigEnabled && !event.player.hasPlayedBefore()) {
-        configManager.firstJoinConfig.onJoin(event.player)
-        return
-      }
-      for (entry in configManager.mainConfig.randomJoinConfigs.entries) {
-        if (entry.key != "demo" && event.player.hasPermission("announcerplus.randomjoin.${entry.key}")) {
-          val randomConfigName = entry.value.selectRandomWeighted()
-          configManager.joinQuitConfigs[randomConfigName]?.onJoin(event.player)
+    @Suppress("DEPRECATION")  // Suppressing deprecated joinMessage and quitMessage fields
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun onJoin(event: PlayerJoinEvent) {
+        if (configManager.mainConfig.joinFeatures) {
+            // Suppress the default join message
+            event.joinMessage = null
+
+            // Handle first join configuration if enabled
+            if (configManager.mainConfig.firstJoinConfigEnabled && !event.player.hasPlayedBefore()) {
+                configManager.firstJoinConfig.onJoin(event.player)
+                return
+            }
+
+            // Fetch the join configuration from join-quit-configs
+            val player = event.player
+            val joinConfig = configManager.joinQuitConfigs["default"] // Replace "default" with actual config name
+            if (joinConfig != null) {
+                // Send join message to the joining player
+                joinConfig.join.messages.forEach { message ->
+                    val expandedMessage = UtilitiesOG.trueogExpandMiniPlaceholders(player, message)
+                    UtilitiesOG.trueogMessage(player, expandedMessage.content())
+                }
+
+                // Broadcast join message to all players except the joining player
+                joinConfig.join.broadcasts.forEach { broadcastMessage ->
+                    val expandedBroadcastMessage = UtilitiesOG.trueogExpandMiniPlaceholders(player, broadcastMessage)
+                    // Broadcast to all players except the joining player
+                    event.joinMessage = expandedBroadcastMessage.content()  // Still setting joinMessage to null
+                }
+            }
+
+            // Apply all other join configurations (e.g., sounds or commands)
+            joinConfig?.onJoin(player)
         }
-      }
-      for (config in configManager.joinQuitConfigs.values) {
-        config.onJoin(event.player)
-      }
     }
-  }
 
-  @EventHandler(priority = EventPriority.HIGHEST)
-  fun onQuit(event: PlayerQuitEvent) {
-    if (configManager.mainConfig.quitFeatures) {
-      event.quitMessage(Component.empty())
-      for (entry in configManager.mainConfig.randomQuitConfigs.entries) {
-        if (entry.key != "demo" && event.player.hasPermission("announcerplus.randomquit.${entry.key}")) {
-          val randomConfigName = entry.value.selectRandomWeighted()
-          configManager.joinQuitConfigs[randomConfigName]?.onQuit(event.player)
+    @Suppress("DEPRECATION")  // Suppressing deprecated quitMessage field
+    @EventHandler(priority = EventPriority.HIGHEST)
+    fun onQuit(event: PlayerQuitEvent) {
+        if (configManager.mainConfig.quitFeatures) {
+            // Suppress the default quit message
+            event.quitMessage = null
+
+            // Fetch the quit configuration from join-quit-configs
+            val player = event.player
+            configManager.joinQuitConfigs["default"]?.let { quitConfig ->
+                // Broadcast quit message to all players except the quitting player
+                quitConfig.quit.broadcasts.forEach { broadcastMessage ->
+                    val expandedBroadcastMessage = UtilitiesOG.trueogExpandMiniPlaceholders(player, broadcastMessage)
+                    // Set quitMessage to the expanded broadcast message
+                    event.quitMessage = expandedBroadcastMessage.content()
+                }
+            }
+
+            // Apply all quit configurations
+            for (config in configManager.joinQuitConfigs.values) {
+                config.onQuit(player)
+            }
+
         }
-      }
-      for (config in configManager.joinQuitConfigs.values) {
-        config.onQuit(event.player)
-      }
     }
-  }
-
-  private fun Collection<JoinQuitPair>.selectRandomWeighted(): String {
-    if (isEmpty()) error("Cannot randomly select from an empty collection")
-    return WeightedRandom<String>().apply {
-      for (pair in this@selectRandomWeighted) {
-        add(pair.weight, pair.configName)
-      }
-    }.next()
-  }
 }

@@ -35,8 +35,8 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.mojang:datafixerupper:7.0.14")
     compileOnly("io.github.miniplaceholders:miniplaceholders-api:2.2.3")
-
-	implementation("xyz.jpenilla:reflection-remapper:0.1.1")
+    compileOnly("net.luckperms:api:5.4")
+    implementation("xyz.jpenilla:reflection-remapper:0.1.1")
     implementation(platform("org.incendo:cloud-bom:2.0.0-rc.2"))
     implementation("org.incendo:cloud-kotlin-extensions")
     implementation(platform("org.incendo:cloud-minecraft-bom:2.0.0-beta.9"))
@@ -47,8 +47,8 @@ dependencies {
     implementation("org.incendo:cloud-translations-bukkit")
     implementation("org.incendo:cloud-translations-minecraft-extras")
 
-    implementation("net.kyori", "adventure-extra-kotlin")
-    implementation("net.kyori", "adventure-serializer-configurate4")
+    implementation("net.kyori:adventure-extra-kotlin")
+    implementation("net.kyori:adventure-serializer-configurate4")
     implementation("org.spongepowered:configurate-extra-kotlin:4.1.2")
     implementation("org.spongepowered:configurate-hocon:4.1.2")
     implementation("io.insert-koin:koin-core:3.5.6")
@@ -83,12 +83,22 @@ tasks {
         minimize()
 
         val prefix = "${project.group}.${project.name.lowercase()}.lib"
-        sequenceOf(
-            "com.typesafe.config", "io.leangen.geantyref", "io.papermc.lib",
-            "net.kyori", "org.incendo", "org.koin", "org.spongepowered.configurate", "kotlin", "xyz.jpenilla.reflectionremapper",
-        ).forEach { pkg ->
-            relocate(pkg, "$prefix.$pkg")
+
+        // Adjusted relocations
+        relocate("com.typesafe.config", "$prefix.com.typesafe.config")
+        relocate("io.leangen.geantyref", "$prefix.io.leangen.geantyref")
+        relocate("io.papermc.lib", "$prefix.io.papermc.lib")
+
+        // Exclude net.kyori.adventure from relocation
+        relocate("net.kyori", "$prefix.net.kyori") {
+            exclude("net/kyori/adventure/**")
         }
+
+        relocate("org.incendo", "$prefix.org.incendo")
+        relocate("org.koin", "$prefix.org.koin")
+        relocate("org.spongepowered.configurate", "$prefix.org.spongepowered.configurate")
+        relocate("kotlin", "$prefix.kotlin")
+        relocate("xyz.jpenilla.reflectionremapper", "$prefix.xyz.jpenilla.reflectionremapper")
 
         dependencies {
             exclude(dependency("org.jetbrains:annotations"))
@@ -96,7 +106,6 @@ tasks {
         }
     }
 
-    // Configure build to depend on shadowJar
     named("build") {
         dependsOn("shadowJar")
     }
@@ -108,7 +117,6 @@ tasks {
     reobfJar {
         outputJar.set(layout.buildDirectory.file("libs/AnnouncerPlus-${project.version}.jar"))
     }
-
 }
 
 kotlin {
