@@ -1,6 +1,6 @@
 package xyz.jpenilla.announcerplus.listener
 
-import me.barny1094875.utilitiesog.UtilitiesOG
+import net.trueog.utilitiesog.UtilitiesOG
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -32,13 +32,13 @@ class JoinQuitListener : Listener, KoinComponent {
             if (joinConfig != null) {
                 // Send join message to the joining player
                 joinConfig.join.messages.forEach { message ->
-                    val expandedMessage = UtilitiesOG.trueogExpandMiniPlaceholders(player, message)
+                    val expandedMessage = UtilitiesOG.trueogExpand(message, player)
                     UtilitiesOG.trueogMessage(player, expandedMessage.content())
                 }
 
                 // Broadcast join message to all players except the joining player
                 joinConfig.join.broadcasts.forEach { broadcastMessage ->
-                    val expandedBroadcastMessage = UtilitiesOG.trueogExpandMiniPlaceholders(player, broadcastMessage)
+                    val expandedBroadcastMessage = UtilitiesOG.trueogExpand(broadcastMessage, player)
                     // Broadcast to all players except the joining player
                     event.joinMessage = expandedBroadcastMessage.content()  // Still setting joinMessage to null
                 }
@@ -61,7 +61,7 @@ class JoinQuitListener : Listener, KoinComponent {
             configManager.joinQuitConfigs["default"]?.let { quitConfig ->
                 // Broadcast quit message to all players except the quitting player
                 quitConfig.quit.broadcasts.forEach { broadcastMessage ->
-                    val expandedBroadcastMessage = UtilitiesOG.trueogExpandMiniPlaceholders(player, broadcastMessage)
+                    val expandedBroadcastMessage = UtilitiesOG.trueogExpand(broadcastMessage, player)
                     // Set quitMessage to the expanded broadcast message
                     event.quitMessage = expandedBroadcastMessage.content()
                 }
