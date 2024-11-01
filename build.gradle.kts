@@ -1,8 +1,8 @@
 plugins {
     java
     eclipse
-    id("io.github.goooler.shadow") version "8.1.8"
-    id("org.jetbrains.kotlin.jvm") version "2.0.20"
+    id("com.gradleup.shadow") version "8.3.2"
+    id("org.jetbrains.kotlin.jvm") version "2.0.21"
     id("io.papermc.paperweight.userdev") version "1.7.2"
     id("xyz.jpenilla.run-paper") version "2.3.0"
     id("net.kyori.indra.git") version "2.0.0"
