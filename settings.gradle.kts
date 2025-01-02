@@ -10,6 +10,5 @@ exec {
 
 include("libs:Utilities-OG")
 include("libs:GxUI-OG")
-include("libs:DiamondBank-OG")
 
 rootProject.name = "AnnouncerPlus-OG"

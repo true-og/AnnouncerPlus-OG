@@ -6,7 +6,6 @@ authors: [jmp, NotAlexNoyle]
 website: https://github.com/true-og/AnnouncerPlus-OG
 api-version: '${apiVersion}'
 depend:
-  - DiamondBank-OG
   - LuckPerms
 softdepend:
   - Essentials

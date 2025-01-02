@@ -56,7 +56,6 @@ dependencies {
     implementation("io.papermc:paperlib:1.0.8")
     implementation(project(":libs:Utilities-OG"))
     implementation(project(":libs:GxUI-OG"))
-    implementation(project(":libs:DiamondBank-OG"))
 
     paperweight.paperDevBundle("1.19.4-R0.1-SNAPSHOT")
 }
