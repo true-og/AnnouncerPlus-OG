@@ -1,4 +1,4 @@
-name: AnnouncerPlus
+name: AnnouncerPlus-OG
 version: $version
 main: xyz.jpenilla.announcerplus.AnnouncerPlus
 description: $description
@@ -6,7 +6,7 @@ authors:
   - jmp
 website: $website
 depend:
-  - Vault
+  - LuckPerms
 api-version: $apiVersion
 softdepend:
   - PlaceholderAPI

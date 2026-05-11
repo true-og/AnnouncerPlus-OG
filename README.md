@@ -1,7 +1,17 @@
-![Announcer Plus](https://i.imgur.com/C46OmJ6.png)
->[![GitHub Actions](https://github.com/jmanpenilla/AnnouncerPlus/workflows/AnnouncerPlus/badge.svg)](https://github.com/jmanpenilla/WanderingTrades/actions) [![Jenkins](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fjenkins.jpenilla.xyz%2Fjob%2FAnnouncerPlus%2F&label=Jenkins)](https://jenkins.jpenilla.xyz/job/AnnouncerPlus/)
-> * [AnnouncerPlus Wiki](https://github.com/jmanpenilla/AnnouncerPlus/wiki)
-> * [Spigot Resource Page](https://www.spigotmc.org/resources/announcer-plus.81005/)
-> * [Discord](https://discord.gg/V2PsMkx)
-> * [Dev Builds](https://jenkins.jpenilla.xyz/job/AnnouncerPlus/)
-> * [bStats](https://bstats.org/plugin/bukkit/Announcer-Plus/8067)
+# AnnouncerPlus-OG
+
+Soft fork of [AnnouncerPlus](https://github.com/jpenilla/AnnouncerPlus) by jmp, maintained by the [TrueOG Network](https://true-og.net) for use on `true-og.net`.
+
+## Differences from upstream
+
+- **LuckPerms instead of Vault** — drops the Vault dependency and talks to LuckPerms 5.5 directly for permission/group lookups.
+- **Bundled default configs** — `main.conf`, `first-join.conf`, `join-quit-configs/default.conf`, and `message-configs/demo.conf` are shaded into the JAR and copied out on first run, so a fresh install boots with TrueOG's live config rather than upstream stubs.
+- **Join broadcasts visible to everyone** — the permission gate that hid join broadcasts from non-staff has been removed.
+- **Join/quit formatting fixes** — corrected MiniMessage formatting in the bundled join/quit configs.
+- **Conditional [Unions-OG](https://github.com/true-og/Unions-OG) tag** — PlaceholderAPI preprocessor hides the union tag when a player has no union, instead of rendering an empty bracket.
+
+## Upstream links
+
+- [Upstream repo](https://github.com/jpenilla/AnnouncerPlus)
+- [Upstream wiki](https://github.com/jpenilla/AnnouncerPlus/wiki)
+- [Spigot resource page](https://www.spigotmc.org/resources/announcer-plus.81005/)

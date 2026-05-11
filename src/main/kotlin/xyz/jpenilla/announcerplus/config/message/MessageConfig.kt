@@ -223,12 +223,12 @@ class MessageConfig : SelfSavable<CommentedConfigurationNode>, KoinComponent {
     for (onlinePlayer in Bukkit.getOnlinePlayers().toList()) {
       if (announcerPlus.essentials != null) {
         if (announcerPlus.essentials!!.isAfk(onlinePlayer) &&
-          announcerPlus.perms!!.playerHas(onlinePlayer, "${announcerPlus.name}.messages.$name.afk")
+          announcerPlus.hasPermission(onlinePlayer, "${announcerPlus.name}.messages.$name.afk")
         ) {
           continue
         }
       }
-      if (announcerPlus.perms!!.playerHas(onlinePlayer, "${announcerPlus.name}.messages.$name")) {
+      if (announcerPlus.hasPermission(onlinePlayer, "${announcerPlus.name}.messages.$name")) {
         with(message) {
           val audience = announcerPlus.audiences().player(onlinePlayer)
           if (messageText.size != 0) {

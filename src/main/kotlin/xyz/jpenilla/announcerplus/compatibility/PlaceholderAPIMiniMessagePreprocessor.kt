@@ -34,14 +34,21 @@ class PlaceholderAPIMiniMessagePreprocessor(private val miniMessage: MiniMessage
   fun process(player: Player, input: String): String =
     this.process(
       PlaceholderAPI.getPlaceholderPattern(),
-      input
+      stripSimpleClansNoneBrackets(input) { PlaceholderAPI.setPlaceholders(player, it) }
     ) { PlaceholderAPI.setPlaceholders(player, it) }
 
   fun process(one: Player, two: Player, input: String): String =
     this.process(
       PlaceholderAPI.getPlaceholderPattern(),
-      input
+      stripSimpleClansNoneBrackets(input) { PlaceholderAPI.setPlaceholders(one, it) }
     ) { PlaceholderAPI.setPlaceholders(one, PlaceholderAPI.setRelationalPlaceholders(one, two, it)) }
+
+  private fun stripSimpleClansNoneBrackets(input: String, resolver: (String) -> String): String {
+    if (!input.contains(SIMPLECLANS_UNION_COLOR_TAG)) return input
+    val resolved = LEGACY_COLOR_CODE_PATTERN.matcher(resolver(SIMPLECLANS_UNION_COLOR_TAG)).replaceAll("").trim()
+    if (!resolved.equals("None", ignoreCase = true)) return input
+    return SIMPLECLANS_NONE_BRACKET_PATTERN.matcher(input).replaceAll("")
+  }
 
   private fun process(
     pattern: Pattern,
@@ -53,13 +60,27 @@ class PlaceholderAPIMiniMessagePreprocessor(private val miniMessage: MiniMessage
     while (matcher.find()) {
       val match = matcher.group()
       val replaced = placeholderResolver(match)
-      if (match == replaced || !replaced.contains(LegacyComponentSerializer.SECTION_CHAR)) {
+      if (match == replaced || !LEGACY_CODE_PATTERN.matcher(replaced).find()) {
         matcher.appendReplacement(buffer, Matcher.quoteReplacement(replaced))
       } else {
-        matcher.appendReplacement(buffer, Matcher.quoteReplacement(miniMessage.serialize(LegacyComponentSerializer.legacySection().deserialize(replaced))))
+        val normalized = AMPERSAND_CODE_PATTERN.matcher(replaced)
+          .replaceAll(LegacyComponentSerializer.SECTION_CHAR.toString() + "$1")
+        matcher.appendReplacement(buffer, Matcher.quoteReplacement(miniMessage.serialize(LegacyComponentSerializer.legacySection().deserialize(normalized))))
       }
     }
     matcher.appendTail(buffer)
     return buffer.toString()
+  }
+
+  companion object {
+    private const val SIMPLECLANS_UNION_COLOR_TAG = "%simpleclans_union_color_tag%"
+    private val SIMPLECLANS_NONE_BRACKET_PATTERN: Pattern =
+      Pattern.compile("(?:<[^>]+>)*\\[(?:<[^>]+>)*\\Q$SIMPLECLANS_UNION_COLOR_TAG\\E(?:<[^>]+>)*](?:<[^>]+>)*\\s?")
+    private val LEGACY_CODE_PATTERN: Pattern =
+      Pattern.compile("[&§][0-9a-fA-Fk-oK-OrRxX]")
+    private val AMPERSAND_CODE_PATTERN: Pattern =
+      Pattern.compile("&([0-9a-fA-Fk-oK-OrRxX])")
+    private val LEGACY_COLOR_CODE_PATTERN: Pattern =
+      Pattern.compile("[&§][0-9a-fA-F]")
   }
 }

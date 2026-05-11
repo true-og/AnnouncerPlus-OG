@@ -28,9 +28,11 @@ import com.google.gson.GsonBuilder
 import io.papermc.lib.PaperLib.getMinecraftVersion
 import io.papermc.lib.PaperLib.isPaper
 import io.papermc.lib.PaperLib.suggestPaper
-import net.milkbowl.vault.permission.Permission
+import net.luckperms.api.LuckPerms
+import net.luckperms.api.platform.PlayerAdapter
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
+import org.bukkit.entity.Player
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
@@ -57,15 +59,15 @@ class AnnouncerPlus : PluginBase(), KoinComponent {
   val gson: Gson = GsonBuilder().create()
   val configManager: ConfigManager by inject()
 
-  var perms: Permission? = null
   var essentials: EssentialsHook? = null
   var toastTask: ToastTask? = null
+  private var permissions: PlayerAdapter<Player>? = null
   private var asyncExecutor: ScheduledExecutorService? = null
   private lateinit var commands: Commands
 
   override fun enable() {
     if (!setupPermissions()) {
-      logger.warning("Permissions plugin not found. AnnouncerPlus will not work.")
+      logger.warning("LuckPerms not found. AnnouncerPlus will not work.")
       isEnabled = false
       return
     }
@@ -165,11 +167,13 @@ class AnnouncerPlus : PluginBase(), KoinComponent {
     return requireNotNull(asyncExecutor) { "Async Executor not initialized" }
   }
 
+  fun hasPermission(player: Player, permission: String): Boolean {
+    return permissions?.getPermissionData(player)?.checkPermission(permission)?.asBoolean() ?: false
+  }
+
   private fun setupPermissions(): Boolean {
-    val rsp = server.servicesManager.getRegistration(Permission::class.java)
-    if (rsp != null) {
-      perms = rsp.provider
-    }
-    return perms != null
+    val rsp = server.servicesManager.getRegistration(LuckPerms::class.java) ?: return false
+    permissions = rsp.provider.getPlayerAdapter(Player::class.java)
+    return true
   }
 }

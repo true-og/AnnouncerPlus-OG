@@ -44,6 +44,7 @@ import xyz.jpenilla.announcerplus.config.serializer.SoundSerializer
 import xyz.jpenilla.announcerplus.util.LegacyChecker
 import xyz.jpenilla.announcerplus.util.miniMessage
 import xyz.jpenilla.pluginbase.legacy.ChatCentering
+import java.nio.file.Files
 import java.nio.file.Path
 import java.util.logging.Logger
 import kotlin.collections.set
@@ -120,8 +121,8 @@ class ConfigManager(
   }
 
   fun reload() {
+    ensureBundledDefaultsExist()
     load()
-    save()
   }
 
   private fun load() {
@@ -148,34 +149,13 @@ class ConfigManager(
     loadJoinQuitConfigs()
   }
 
-  private fun save() {
-    val mainConfigRoot = mainConfigLoader.createNode()
-    mainConfig.saveTo(mainConfigRoot)
-    mainConfigLoader.save(mainConfigRoot)
-
-    val firstJoinConfigRoot = firstJoinConfigLoader.createNode()
-    firstJoinConfig.saveTo(firstJoinConfigRoot)
-    firstJoinConfigRoot.removeChild("quit-section")
-    firstJoinConfigLoader.save(firstJoinConfigRoot)
-  }
-
   private fun loadJoinQuitConfigs() {
     joinQuitConfigs.clear()
     val joinQuitConfigsDirectory = dataDirectory.resolve("join-quit-configs")
 
     val createDefaultConfig = {
-      logger.info("No join/quit configs found, creating default.conf")
-
-      val defaultConfig = joinQuitConfigsDirectory.resolve("default.conf")
-      val defaultConfigLoader = createLoader(defaultConfig) {
-        it.header(
-          "To give a player these join/quit messages give them the announcerplus.join.default\n" +
-            "  and announcerplus.quit.default permissions"
-        )
-      }
-      val defaultConfigRoot = defaultConfigLoader.createNode()
-      JoinQuitConfig().saveTo(defaultConfigRoot)
-      defaultConfigLoader.save(defaultConfigRoot)
+      logger.info("No join/quit configs found, copying bundled default.conf")
+      saveBundledResource("join-quit-configs/default.conf", joinQuitConfigsDirectory.resolve("default.conf"))
     }
 
     joinQuitConfigs += joinQuitConfigsDirectory.loadConfigs(
@@ -192,20 +172,8 @@ class ConfigManager(
     val messageConfigsDirectory = dataDirectory.resolve("message-configs")
 
     val createDefaultConfig = {
-      logger.info("No message configs found, creating demo.conf")
-
-      val defaultConfig = messageConfigsDirectory.resolve("demo.conf")
-      val defaultConfigLoader = createLoader(defaultConfig) {
-        it.header(
-          """For a player to get these messages give them the announcerplus.messages.demo permission
-                      |  If EssentialsX is installed, then giving a player the announcerplus.messages.demo.afk permission
-                      |  will stop them from receiving these messages while afk
-          """.trimMargin()
-        )
-      }
-      val defaultConfigRoot = defaultConfigLoader.createNode()
-      MessageConfig().saveTo(defaultConfigRoot)
-      defaultConfigLoader.save(defaultConfigRoot)
+      logger.info("No message configs found, copying bundled demo.conf")
+      saveBundledResource("message-configs/demo.conf", messageConfigsDirectory.resolve("demo.conf"))
     }
 
     messageConfigs += messageConfigsDirectory.loadConfigs(
@@ -236,14 +204,29 @@ class ConfigManager(
         val node = loader.load()
         upgradeNode(upgrader, node, configTypeName, configName)
         val loadedConfiguration = factory.loadFrom(node, configName)
-        loadedConfiguration.saveTo(node)
         result[configName] = loadedConfiguration
-        loader.save(node)
       } catch (ex: Exception) {
         throw IllegalArgumentException("Failed to load $configTypeName config: ${configFile.name}. This is likely due to an invalid config file.", ex)
       }
     }
     return result
+  }
+
+  private fun ensureBundledDefaultsExist() {
+    saveBundledResource("main.conf", mainConfigPath)
+    saveBundledResource("first-join.conf", firstJoinConfigPath)
+    saveBundledResource("join-quit-configs/default.conf", dataDirectory.resolve("join-quit-configs/default.conf"))
+    saveBundledResource("message-configs/demo.conf", dataDirectory.resolve("message-configs/demo.conf"))
+  }
+
+  private fun saveBundledResource(resourcePath: String, destination: Path) {
+    if (destination.isRegularFile()) {
+      return
+    }
+    destination.parent?.createDirectories()
+    announcerPlus.getResource(resourcePath)?.use { input ->
+      Files.copy(input, destination)
+    } ?: error("Bundled resource '$resourcePath' was not found in the plugin jar.")
   }
 
   private fun <N : ConfigurationNode> upgradeNode(

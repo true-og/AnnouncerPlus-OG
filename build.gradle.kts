@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
+  eclipse
   kotlin("jvm") version "2.2.10"
   alias(libs.plugins.indra) apply false
   alias(libs.plugins.indraGit)
@@ -15,12 +16,6 @@ plugins {
 
 repositories {
   mavenCentral()
-  maven("https://repo.jpenilla.xyz/snapshots/") {
-    mavenContent {
-      snapshotsOnly()
-      includeGroup("xyz.jpenilla")
-    }
-  }
   maven("https://central.sonatype.com/repository/maven-snapshots/") {
     mavenContent { snapshotsOnly() }
   }
@@ -32,13 +27,16 @@ repositories {
   maven("https://jitpack.io") {
     content { includeGroupByRegex("com\\.github\\..*") }
   }
+  maven("https://s01.oss.sonatype.org/content/groups/public/")
+  maven("https://oss.sonatype.org/content/groups/public/")
+  maven("https://repo.jpenilla.xyz/snapshots/")
 }
 
 dependencies {
   implementation(platform(kotlin("bom")))
 
   compileOnly("dev.folia", "folia-api", "1.19.4-R0.1-SNAPSHOT")
-  compileOnly("com.github.MilkBowl", "VaultAPI", "1.7.1")
+  compileOnly("net.luckperms", "api", "5.5")
   compileOnly("net.essentialsx", "EssentialsX", "2.21.2") {
     isTransitive = false
   }
@@ -49,6 +47,7 @@ dependencies {
   implementation(platform("net.kyori:adventure-bom:4.24.0"))
   implementation("net.kyori", "adventure-extra-kotlin")
   implementation("net.kyori", "adventure-serializer-configurate4")
+  implementation("net.kyori:adventure-text-feature-pagination:4.0.0-SNAPSHOT")
 
   implementation(platform("org.incendo:cloud-bom:2.0.0"))
   implementation("org.incendo:cloud-kotlin-extensions")
@@ -74,7 +73,7 @@ dependencies {
   }
 }
 
-version = (version as String).decorateVersion()
+version = version as String
 
 kotlin {
   jvmToolchain {
@@ -93,7 +92,7 @@ tasks {
     options.release = 17
   }
   jar {
-    archiveClassifier = "not-shadowed"
+    enabled = false
     manifest {
       attributes("paperweight-mappings-namespace" to "mojang")
     }
@@ -107,7 +106,7 @@ tasks {
     archiveClassifier.set(null as String?)
     archiveBaseName.set(project.name) // Use uppercase name for final jar
 
-    val prefix = "${project.group}.${project.name.lowercase()}.lib"
+    val prefix = "${project.group}.${project.name.lowercase().replace("-", "")}.lib"
     sequenceOf(
       "io.leangen.geantyref",
       "io.papermc.lib",
@@ -203,9 +202,3 @@ spotless {
 plugins.apply(libs.plugins.indraSpotless.get().pluginId)
 
 runPaper.folia.registerTask()
-
-fun String.decorateVersion(): String =
-  if (endsWith("-SNAPSHOT")) "$this+${lastCommitHash()}" else this
-
-fun lastCommitHash(): String = indraGit.commit()?.name?.substring(0, 7)
-  ?: error("Failed to determine git hash.")
