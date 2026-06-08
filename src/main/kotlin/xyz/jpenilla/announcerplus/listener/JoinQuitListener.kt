@@ -23,6 +23,8 @@
  */
 package xyz.jpenilla.announcerplus.listener
 
+import net.luckperms.api.LuckPermsProvider
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -33,9 +35,20 @@ import org.koin.core.component.inject
 import xyz.jpenilla.announcerplus.config.ConfigManager
 import xyz.jpenilla.announcerplus.config.MainConfig.JoinQuitPair
 import xyz.jpenilla.pluginbase.legacy.WeightedRandom
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.logging.Logger
 
 class JoinQuitListener : Listener, KoinComponent {
   private val configManager: ConfigManager by inject()
+  private val logger: Logger by inject()
+
+  private val quitTimeFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy 'at' h:mm:ss a zzz", Locale.US)
+
+  private val newYorkZone: ZoneId = ZoneId.of("America/New_York")
 
   @EventHandler(priority = EventPriority.HIGHEST)
   fun onJoin(event: PlayerJoinEvent) {
@@ -59,6 +72,7 @@ class JoinQuitListener : Listener, KoinComponent {
 
   @EventHandler(priority = EventPriority.HIGHEST)
   fun onQuit(event: PlayerQuitEvent) {
+    logQuit(event.player)
     if (configManager.mainConfig.quitFeatures) {
       event.quitMessage = ""
       for (entry in configManager.mainConfig.randomQuitConfigs.entries) {
@@ -71,6 +85,28 @@ class JoinQuitListener : Listener, KoinComponent {
         config.onQuit(event.player)
       }
     }
+  }
+
+  private fun logQuit(player: Player) {
+    val time = ZonedDateTime.now(newYorkZone).format(quitTimeFormatter)
+    val loc = player.location
+    val world = loc.world?.name ?: "unknown"
+    val rank = runCatching {
+      LuckPermsProvider.get().getPlayerAdapter(Player::class.java).getUser(player).primaryGroup
+    }.getOrDefault("unknown")
+    logger.info(
+      "[Logout] %s | rank=%s | world=%s x=%.2f y=%.2f z=%.2f | hp=%.1f/%.1f | time=%s".format(
+        player.name,
+        rank,
+        world,
+        loc.x,
+        loc.y,
+        loc.z,
+        player.health,
+        player.maxHealth,
+        time,
+      )
+    )
   }
 
   private fun Collection<JoinQuitPair>.selectRandomWeighted(): String {
