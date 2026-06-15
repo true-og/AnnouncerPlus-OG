@@ -23,7 +23,6 @@
  */
 package xyz.jpenilla.announcerplus.listener
 
-import net.luckperms.api.LuckPermsProvider
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -91,13 +90,10 @@ class JoinQuitListener : Listener, KoinComponent {
     val time = ZonedDateTime.now(newYorkZone).format(quitTimeFormatter)
     val loc = player.location
     val world = loc.world?.name ?: "unknown"
-    val rank = runCatching {
-      LuckPermsProvider.get().getPlayerAdapter(Player::class.java).getUser(player).primaryGroup
-    }.getOrDefault("unknown")
     logger.info(
-      "[Logout] %s | rank=%s | world=%s x=%.2f y=%.2f z=%.2f | hp=%.1f/%.1f | time=%s".format(
+      "[Logout] %s | uuid=%s | world=%s x=%.2f y=%.2f z=%.2f | hp=%.1f/%.1f | time=%s".format(
         player.name,
-        rank,
+        player.uniqueId,
         world,
         loc.x,
         loc.y,
