@@ -216,6 +216,7 @@ class ConfigManager(
     saveBundledResource("main.conf", mainConfigPath)
     saveBundledResource("first-join.conf", firstJoinConfigPath)
     saveBundledResource("join-quit-configs/default.conf", dataDirectory.resolve("join-quit-configs/default.conf"))
+    saveBundledResource("message-configs/announcements.conf", dataDirectory.resolve("message-configs/announcements.conf"))
     saveBundledResource("message-configs/demo.conf", dataDirectory.resolve("message-configs/demo.conf"))
   }
 

@@ -221,13 +221,6 @@ class MessageConfig : SelfSavable<CommentedConfigurationNode>, KoinComponent {
 
   private fun broadcast(message: Message) {
     for (onlinePlayer in Bukkit.getOnlinePlayers().toList()) {
-      if (announcerPlus.essentials != null) {
-        if (announcerPlus.essentials!!.isAfk(onlinePlayer) &&
-          announcerPlus.hasPermission(onlinePlayer, "${announcerPlus.name}.messages.$name.afk")
-        ) {
-          continue
-        }
-      }
       if (announcerPlus.hasPermission(onlinePlayer, "${announcerPlus.name}.messages.$name")) {
         with(message) {
           val audience = announcerPlus.audiences().player(onlinePlayer)

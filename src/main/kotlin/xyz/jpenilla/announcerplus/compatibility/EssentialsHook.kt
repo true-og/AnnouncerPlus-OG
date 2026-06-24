@@ -31,10 +31,6 @@ import org.bukkit.entity.Player
 class EssentialsHook {
   val essentials = Bukkit.getServer().pluginManager.getPlugin("Essentials") as IEssentials
 
-  fun isAfk(player: Player): Boolean {
-    return user(player).isAfk
-  }
-
   fun isVanished(player: Player): Boolean {
     return user(player).isVanished
   }
