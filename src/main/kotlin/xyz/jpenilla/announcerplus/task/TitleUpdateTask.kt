@@ -42,7 +42,8 @@ class TitleUpdateTask(
   private val duration: Int,
   private val fadeOut: Int,
   private val title: String,
-  private val subtitle: String
+  private val subtitle: String,
+  private val delayTicks: Int = 0
 ) : UpdateTask() {
   private val audience = get<BukkitAudiences>().player(player)
   private val configManager: ConfigManager by inject()
@@ -64,7 +65,8 @@ class TitleUpdateTask(
 
   override fun stop() {
     super.stop()
-    if (fadeOut == 0) {
+    // Don't flash a fade-out if the task was cancelled before the title was ever shown.
+    if (fadeOut == 0 || ticksLived < delayTicks) {
       return
     }
     audience.showTitle(
@@ -80,6 +82,11 @@ class TitleUpdateTask(
   }
 
   override fun update() {
+    // Wait out the configured delay before showing anything.
+    if (ticksLived < delayTicks) {
+      return
+    }
+    val shownTicks = ticksLived - delayTicks
     if (fadeIn == 0) {
       audience.showTitle(
         title(
@@ -90,7 +97,7 @@ class TitleUpdateTask(
       )
       return
     }
-    if (ticksLived == 0L) {
+    if (shownTicks == 0L) {
       audience.showTitle(
         title(
           title(),
@@ -101,7 +108,7 @@ class TitleUpdateTask(
           )
         )
       )
-    } else if (ticksLived > fadeIn * 20L) {
+    } else if (shownTicks > fadeIn * 20L) {
       audience.showTitle(
         title(
           title(),
@@ -113,7 +120,7 @@ class TitleUpdateTask(
   }
 
   override fun shouldContinue(): Boolean {
-    return ticksLived < 20L * (fadeIn + duration) && player.isOnline
+    return ticksLived < delayTicks + 20L * (fadeIn + duration) && player.isOnline
   }
 
   override fun synchronizationContext() = SynchronizationContext.ASYNC

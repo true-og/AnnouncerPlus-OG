@@ -35,13 +35,17 @@ class TitleSettings : MessageElement {
   private val displayTracker: DisplayTracker by inject()
 
   constructor()
-  constructor(fadeInSeconds: Int, durationSeconds: Int, fadeOutSeconds: Int, title: String, subTitle: String) {
+  constructor(fadeInSeconds: Int, durationSeconds: Int, fadeOutSeconds: Int, title: String, subTitle: String, delayTicks: Int = 0) {
     this.fadeInSeconds = fadeInSeconds
     this.fadeOutSeconds = fadeOutSeconds
     this.title = title
     this.subtitle = subTitle
     this.durationSeconds = durationSeconds
+    this.delayTicks = delayTicks
   }
+
+  @Comment("Ticks to wait before showing the title to the player (20 ticks = 1 second)")
+  var delayTicks = 0
 
   @Comment("Seconds of duration for the title fade-in animation")
   var fadeInSeconds = 1
@@ -67,7 +71,7 @@ class TitleSettings : MessageElement {
   }
 
   override fun display(player: Player) {
-    val task = TitleUpdateTask(player, fadeInSeconds, durationSeconds, fadeOutSeconds, title, subtitle)
+    val task = TitleUpdateTask(player, fadeInSeconds, durationSeconds, fadeOutSeconds, title, subtitle, delayTicks)
     displayTracker.startAndTrack(player.uniqueId, task)
   }
 }
