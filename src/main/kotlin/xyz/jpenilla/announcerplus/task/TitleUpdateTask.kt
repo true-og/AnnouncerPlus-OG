@@ -50,6 +50,12 @@ class TitleUpdateTask(
   private val titleAnimation = AnimationHolder.create(player, title)
   private val subTitleAnimation = AnimationHolder.create(player, subtitle)
 
+  // A static title can be shown with a single packet, letting the client smoothly handle the
+  // whole fade-in/stay/fade-out animation. Re-sending it every tick is what caused the flicker.
+  // Animated text still needs a per-tick refresh.
+  private val animated = titleAnimation.hasAnimations() || subTitleAnimation.hasAnimations()
+  private var shown = false
+
   private fun times(
     fadeIn: Duration = ZERO,
     stay: Duration = ZERO,
@@ -65,8 +71,10 @@ class TitleUpdateTask(
 
   override fun stop() {
     super.stop()
+    // Static titles already carry their fade-out in the initial packet; only animated titles,
+    // which were re-sent each tick with a brief stay, need the fade-out driven here.
     // Don't flash a fade-out if the task was cancelled before the title was ever shown.
-    if (fadeOut == 0 || ticksLived < delayTicks) {
+    if (!animated || fadeOut == 0 || ticksLived < delayTicks) {
       return
     }
     audience.showTitle(
@@ -86,6 +94,28 @@ class TitleUpdateTask(
     if (ticksLived < delayTicks) {
       return
     }
+
+    if (!animated) {
+      // Send the title once with the full fade-in/stay/fade-out times and let the client
+      // animate it smoothly. The task stays alive (see shouldContinue) only to keep owning
+      // the display slot for its configured duration.
+      if (!shown) {
+        shown = true
+        audience.showTitle(
+          title(
+            title(),
+            subtitle(),
+            times(
+              fadeIn = Duration.ofSeconds(fadeIn.toLong()),
+              stay = Duration.ofSeconds(duration.toLong()),
+              fadeOut = Duration.ofSeconds(fadeOut.toLong())
+            )
+          )
+        )
+      }
+      return
+    }
+
     val shownTicks = ticksLived - delayTicks
     if (fadeIn == 0) {
       audience.showTitle(

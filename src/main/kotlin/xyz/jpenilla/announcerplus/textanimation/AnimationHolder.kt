@@ -48,6 +48,8 @@ class AnimationHolder(
 
   private val animations: Map<String, TextAnimation> = findAnimations()
 
+  fun hasAnimations(): Boolean = animations.isNotEmpty()
+
   private fun findAnimations(): Map<String, TextAnimation> {
     val map: MutableMap<String, TextAnimation> = HashMap()
 
