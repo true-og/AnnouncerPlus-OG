@@ -8,7 +8,7 @@ Soft fork of [AnnouncerPlus](https://github.com/jpenilla/AnnouncerPlus) by jmp, 
 - **Bundled default configs** - `main.conf`, `first-join.conf`, `join-quit-configs/default.conf`, and `message-configs/demo.conf` are shaded into the JAR and copied out on first run, so a fresh install boots with TrueOG's live config rather than upstream stubs.
 - **Join broadcasts visible to everyone** - the permission gate that hid join broadcasts from non-staff has been removed.
 - **Join/quit formatting fixes** - corrected MiniMessage formatting in the bundled join/quit configs.
-- **Conditional [Unions-OG](https://github.com/true-og/Unions-OG) tag** - PlaceholderAPI preprocessor hides the union tag when a player has no union, instead of rendering an empty bracket.
+- **Conditional [Unions-OG](https://git.trueog.net/trueog/Unions-OG) tag** - PlaceholderAPI preprocessor hides the union tag when a player has no union, instead of rendering an empty bracket.
 - **Smoother welcome title** - Fade animation like old TitleManager.
 
 ## Upstream links
